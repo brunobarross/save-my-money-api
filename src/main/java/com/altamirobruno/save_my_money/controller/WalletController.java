@@ -1,5 +1,6 @@
 package com.altamirobruno.save_my_money.controller;
 
+import com.altamirobruno.save_my_money.dto.WalletDTO;
 import com.altamirobruno.save_my_money.model.Wallet;
 import com.altamirobruno.save_my_money.service.WalletService;
 import org.springframework.http.HttpStatus;
@@ -12,23 +13,24 @@ import java.util.List;
 public class WalletController {
   private final WalletService walletService;
 
-  public WalletController(WalletService walletService){
+  public WalletController(WalletService walletService) {
     this.walletService = walletService;
   }
 
   @GetMapping
-  public List<Wallet> getAll(){
+  public List<WalletDTO> getAll() {
     return walletService.getAll();
   }
 
   @PostMapping
-  public Wallet create(@RequestBody Wallet wallet){
+  public WalletDTO create(@RequestBody WalletDTO wallet) {
     return walletService.create(wallet);
   }
 
-//  @ResponseStatus(code = HttpStatus.NO_CONTENT)
-//  @DeleteMapping("/${id}")
-//  public void delete(@PathVariable Long id){
-//    walletService.remove(id);
-//  }
+  @DeleteMapping
+  public void delete(Long id) {
+    walletService.delete(id);
+  }
+
+
 }
