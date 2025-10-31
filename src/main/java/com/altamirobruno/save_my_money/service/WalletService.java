@@ -4,7 +4,6 @@ package com.altamirobruno.save_my_money.service;
 import com.altamirobruno.save_my_money.dto.WalletDTO;
 import com.altamirobruno.save_my_money.dto.mappers.WalletMapper;
 import com.altamirobruno.save_my_money.exceptions.ItemNotFoundException;
-import com.altamirobruno.save_my_money.model.Wallet;
 import com.altamirobruno.save_my_money.repository.WalletRepository;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +25,7 @@ public class WalletService {
       .stream()
       .map(walletMapper::toDTO)
       .collect(Collectors.toList());
-  }mapper
+  }
 
   public WalletDTO create(WalletDTO wallet) {
     return walletMapper.toDTO(walletRepository.save(walletMapper.toEntity(wallet)));
