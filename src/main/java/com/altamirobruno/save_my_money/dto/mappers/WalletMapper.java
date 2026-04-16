@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class WalletMapper {
   public WalletDTO toDTO(Wallet wallet) {
-    return new WalletDTO(wallet.getId(), wallet.getName(), wallet.getBalance());
+    return new WalletDTO(wallet.getId(), wallet.getName(), wallet.getColor());
 
   }
 
@@ -25,7 +25,7 @@ public class WalletMapper {
     }
 
     wallet.setName(walletDTO.name());
-    wallet.setBalance(walletDTO.balance());
+    wallet.setColor(walletDTO.color());
 
     return wallet;
 

@@ -7,7 +7,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.annotations.processing.Pattern;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -25,12 +27,15 @@ public class Wallet {
 
     @NotNull
     @NotEmpty
-    @Column(name="balance", nullable = false)
-    private Double balance;
+    @Column(name="color", nullable = false)
+    private String color;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private Status status = Status.ACTIVE;
+
+    @OneToMany(mappedBy = "wallet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions = new ArrayList<>();
 
 }
