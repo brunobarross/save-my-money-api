@@ -26,12 +26,14 @@ public class Transaction {
     @Column(nullable = false)
     private TransactionType type;
 
-    
+
     private LocalDate date;
     private String installment;
 
     @ManyToOne
-    @JoinColumn(name = "wallet_id")
+    @NotNull
+    @NotEmpty
+    @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
 
     @PrePersist
