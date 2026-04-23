@@ -27,6 +27,7 @@ public class WalletMapper {
     wallet.setName(walletDTO.name());
     wallet.setColor(walletDTO.color());
 
+
     return wallet;
 
   }

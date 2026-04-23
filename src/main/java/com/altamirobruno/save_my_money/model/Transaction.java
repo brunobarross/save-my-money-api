@@ -1,6 +1,7 @@
 package com.altamirobruno.save_my_money.model;
 
 import com.altamirobruno.save_my_money.enums.TransactionType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "Transaction")
+@Table(name = "tb_transactions")
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -21,19 +22,16 @@ public class Transaction {
     private Float value;
     private String description;
 
-    @NotEmpty
     @NotNull
     @Column(nullable = false)
-    private TransactionType type;
-
+    private TransactionType type = TransactionType.EXPENSE;
 
     private LocalDate date;
     private String installment;
 
     @ManyToOne
-    @NotNull
-    @NotEmpty
-    @JoinColumn(name = "wallet_id", nullable = false)
+    @JoinColumn(name = "wallet_id")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Wallet wallet;
 
     @PrePersist

@@ -3,6 +3,7 @@ package com.altamirobruno.save_my_money.controller;
 import com.altamirobruno.save_my_money.dto.WalletDTO;
 import com.altamirobruno.save_my_money.model.Wallet;
 import com.altamirobruno.save_my_money.service.WalletService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
@@ -24,9 +25,20 @@ public class WalletController {
     return walletService.getAll();
   }
 
+  @GetMapping("/{id}")
+  public WalletDTO getById(@PathVariable @NotNull @Positive Long id){
+    return walletService.getById(id);
+  }
+
   @PostMapping
-  public WalletDTO create(@RequestBody WalletDTO wallet) {
+  @ResponseStatus(code = HttpStatus.CREATED)
+  public WalletDTO create(@RequestBody @Valid WalletDTO wallet) {
     return walletService.create(wallet);
+  }
+
+  @PutMapping("/{id}")
+  public WalletDTO update(@PathVariable @NotNull @Positive Long id, @RequestBody WalletDTO walletDTO){
+  return walletService.update(id, walletDTO);
   }
 
   @ResponseStatus(code = HttpStatus.NO_CONTENT)

@@ -5,6 +5,9 @@ import com.altamirobruno.save_my_money.dto.WalletDTO;
 import com.altamirobruno.save_my_money.dto.mappers.WalletMapper;
 import com.altamirobruno.save_my_money.exceptions.ItemNotFoundException;
 import com.altamirobruno.save_my_money.repository.WalletRepository;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,11 +30,23 @@ public class WalletService {
       .collect(Collectors.toList());
   }
 
-  public WalletDTO create(WalletDTO wallet) {
+  public WalletDTO getById(@NotNull @Positive Long id){
+    return walletRepository.findById(id).map(walletMapper::toDTO).orElseThrow(()-> new ItemNotFoundException(id));
+  }
+
+  public WalletDTO create(@Valid @NotNull WalletDTO wallet) {
     return walletMapper.toDTO(walletRepository.save(walletMapper.toEntity(wallet)));
   }
 
-  public void delete(Long id) {
+  public WalletDTO update(@NotNull @Positive Long id, @Valid @NotNull WalletDTO walletDTO){
+    return walletRepository.findById(id)
+            .map(item ->{
+              item.setName(walletDTO.name());
+              item.setColor(walletDTO.color());
+              return walletRepository.save(item);
+            }).map(walletMapper::toDTO).orElseThrow(()-> new ItemNotFoundException(id));
+  }
+  public void delete(@NotNull @Positive Long id) {
     walletRepository.delete(walletRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(id)));
   }
 
