@@ -11,16 +11,17 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Entity
 @Table(name = "tb_wallets")
-@SQLDelete(sql = "UPDATE wallet SET status = 'DISABLED' WHERE id = ?")
+@SQLDelete(sql = "UPDATE tb_wallets SET status = 'DISABLED' WHERE id = ?::uuid")
 @SQLRestriction("status = 'ACTIVE'")
 public class Wallet {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @NotNull
     @Column(length = 30, nullable = false)

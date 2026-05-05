@@ -9,14 +9,15 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Entity
 @Table(name = "tb_transactions")
 public class Transaction {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     private String name;
     @Column(name = "amount_value")
     private Float value;
@@ -30,7 +31,7 @@ public class Transaction {
     private String installment;
 
     @ManyToOne
-    @JoinColumn(name = "wallet_id")
+    @JoinColumn(name = "wallet_id", columnDefinition = "uuid")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Wallet wallet;
 

@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Positive;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +31,7 @@ public class WalletService {
       .collect(Collectors.toList());
   }
 
-  public WalletDTO getById(@NotNull @Positive Long id){
+  public WalletDTO getById(@NotNull UUID id){
     return walletRepository.findById(id).map(walletMapper::toDTO).orElseThrow(()-> new ItemNotFoundException(id));
   }
 
@@ -38,7 +39,7 @@ public class WalletService {
     return walletMapper.toDTO(walletRepository.save(walletMapper.toEntity(wallet)));
   }
 
-  public WalletDTO update(@NotNull @Positive Long id, @Valid @NotNull WalletDTO walletDTO){
+  public WalletDTO update(@NotNull UUID id, @Valid @NotNull WalletDTO walletDTO){
     return walletRepository.findById(id)
             .map(item ->{
               item.setName(walletDTO.name());
@@ -46,7 +47,7 @@ public class WalletService {
               return walletRepository.save(item);
             }).map(walletMapper::toDTO).orElseThrow(()-> new ItemNotFoundException(id));
   }
-  public void delete(@NotNull @Positive Long id) {
+  public void delete(@NotNull UUID id) {
     walletRepository.delete(walletRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(id)));
   }
 

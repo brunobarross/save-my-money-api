@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/wallets")
@@ -26,7 +27,7 @@ public class WalletController {
   }
 
   @GetMapping("/{id}")
-  public WalletDTO getById(@PathVariable @NotNull @Positive Long id){
+  public WalletDTO getById(@PathVariable @NotNull UUID id){
     return walletService.getById(id);
   }
 
@@ -37,15 +38,13 @@ public class WalletController {
   }
 
   @PutMapping("/{id}")
-  public WalletDTO update(@PathVariable @NotNull @Positive Long id, @RequestBody WalletDTO walletDTO){
+  public WalletDTO update(@PathVariable @NotNull UUID id, @RequestBody WalletDTO walletDTO){
   return walletService.update(id, walletDTO);
   }
 
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   @DeleteMapping("/{id}")
-  public void delete(@PathVariable Long id) {
+  public void delete(@PathVariable UUID id) {
     walletService.delete(id);
   }
-
-
 }

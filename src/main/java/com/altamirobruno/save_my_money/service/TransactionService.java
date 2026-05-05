@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Positive;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +34,7 @@ public class TransactionService {
                 .collect(Collectors.toList());
     }
 
-    public TransactionDTO getById(@NotNull @Positive Long id){
+    public TransactionDTO getById(@NotNull UUID id){
         return transactionRepository.findById(id).map(transactionMapper::toDTO).orElseThrow(()-> new ItemNotFoundException(id));
     }
 
@@ -41,7 +42,7 @@ public class TransactionService {
         return transactionMapper.toDTO(transactionRepository.save(transactionMapper.toEntity(transaction)));
     }
 
-    public TransactionDTO update(@NotNull @Positive Long id, @Valid @NotNull TransactionDTO transactionDTO){
+    public TransactionDTO update(@NotNull UUID id, @Valid @NotNull TransactionDTO transactionDTO){
         return transactionRepository.findById(id)
                 .map(item ->{
                    item.setName(transactionDTO.name());
@@ -54,7 +55,7 @@ public class TransactionService {
 
     }
 
-    public void delete(@NotNull @Positive Long id) {
+    public void delete(@NotNull UUID id) {
         transactionRepository.delete(transactionRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(id)));
     }
 }

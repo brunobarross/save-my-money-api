@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -27,12 +28,12 @@ public class TransactionController {
     }
 
     @GetMapping("/{id}")
-    public TransactionDTO getById(@PathVariable @NotNull @Positive Long id){
+    public TransactionDTO getById(@PathVariable @NotNull UUID id){
         return transactionService.getById(id);
     }
 
     @PutMapping("/{id}")
-    public TransactionDTO update(@PathVariable @NotNull @Positive Long id, @RequestBody TransactionDTO transactionDTO){
+    public TransactionDTO update(@PathVariable @NotNull UUID id, @RequestBody TransactionDTO transactionDTO){
         return  transactionService.update(id, transactionDTO);
 
     }
@@ -46,7 +47,7 @@ public class TransactionController {
 
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable UUID id) {
         transactionService.delete(id);
     }
 }
