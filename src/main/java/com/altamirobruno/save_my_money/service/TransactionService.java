@@ -10,6 +10,7 @@ import com.altamirobruno.save_my_money.repository.WalletRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
         this.transactionMapper = transactionMapper;
     }
+
 
     public List<TransactionDTO> getAll() {
         return transactionRepository.findAll()

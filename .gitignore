@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Ignore the actual database storage files
+postgres-data/
+pg_data/
+data/db/

@@ -8,6 +8,7 @@ import com.altamirobruno.save_my_money.repository.WalletRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class WalletService {
     this.walletMapper = walletMapper;
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
   public List<WalletDTO> getAll() {
     return walletRepository.findAll()
       .stream()
@@ -31,6 +33,7 @@ public class WalletService {
       .collect(Collectors.toList());
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
   public WalletDTO getById(@NotNull UUID id){
     return walletRepository.findById(id).map(walletMapper::toDTO).orElseThrow(()-> new ItemNotFoundException(id));
   }
