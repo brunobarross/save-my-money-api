@@ -80,6 +80,7 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/authenticate").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));
 
