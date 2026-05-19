@@ -1,7 +1,7 @@
 package com.altamirobruno.save_my_money.dto;
 
 
-public record LoginDTO(
+public record LoginRequestDTO(
         String username,
         String password
 ) {

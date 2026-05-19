@@ -1,6 +1,6 @@
 package com.altamirobruno.save_my_money.service;
 
-import com.altamirobruno.save_my_money.dto.LoginDTO;
+import com.altamirobruno.save_my_money.dto.LoginRequestDTO;
 import com.altamirobruno.save_my_money.dto.LoginResponseDTO;
 import com.altamirobruno.save_my_money.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -28,16 +28,16 @@ public class AuthService {
     }
 
 
-    public LoginResponseDTO login(LoginDTO loginDTO) {
+    public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
         try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.username(), loginDTO.password()));
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.username(), loginRequestDTO.password()));
             return new LoginResponseDTO(
                     (User) authentication.getPrincipal(),
                     jwtService.generateToken(authentication)
             );
         } catch (AuthenticationException error) {
             Logger logger = Logger.getLogger(getClass().getName());
-            logger.info("Autenticação falhou para o usuário " + loginDTO.username() + ": " + error.getMessage());
+            logger.info("Autenticação falhou para o usuário " + loginRequestDTO.username() + ": " + error.getMessage());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, error.getMessage());
         }
     }

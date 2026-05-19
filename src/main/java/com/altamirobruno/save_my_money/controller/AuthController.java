@@ -1,7 +1,7 @@
 package com.altamirobruno.save_my_money.controller;
 
 
-import com.altamirobruno.save_my_money.dto.LoginDTO;
+import com.altamirobruno.save_my_money.dto.LoginRequestDTO;
 import com.altamirobruno.save_my_money.dto.LoginResponseDTO;
 import com.altamirobruno.save_my_money.service.AuthService;
 import jakarta.validation.constraints.NotNull;
@@ -22,7 +22,7 @@ public class AuthController {
 
 
     @PostMapping
-    public LoginResponseDTO login(@NotNull @RequestBody LoginDTO loginDTO) {
-        return authService.login(loginDTO);
+    public LoginResponseDTO login(@NotNull @RequestBody LoginRequestDTO loginRequestDTO) {
+        return authService.login(loginRequestDTO);
     }
 }
