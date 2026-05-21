@@ -35,4 +35,5 @@ build/
 # Ignore the actual database storage files
 postgres-data/
 pg_data/
+pgdata/
 data/db/

@@ -31,7 +31,7 @@ public class JWTService {
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expire))
                 .subject(authentication.getName())
-                .claim("scope", scopes)
+                .claim("roles", scopes)
                 .build();
 
         return encoder.encode(JwtEncoderParameters.from(claimns)).getTokenValue();
