@@ -38,7 +38,7 @@ public class AuthService {
         } catch (AuthenticationException error) {
             Logger logger = Logger.getLogger(getClass().getName());
             logger.info("Autenticação falhou para o usuário " + loginRequestDTO.username() + ": " + error.getMessage());
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, error.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário ou senha incorretos!");
         }
     }
 }

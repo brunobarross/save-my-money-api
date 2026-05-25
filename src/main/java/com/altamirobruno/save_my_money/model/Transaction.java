@@ -1,6 +1,7 @@
 package com.altamirobruno.save_my_money.model;
 
 import com.altamirobruno.save_my_money.enums.TransactionType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
@@ -27,7 +28,9 @@ public class Transaction {
     @Column(nullable = false)
     private TransactionType type = TransactionType.EXPENSE;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate date;
+
     private String installment;
 
     @ManyToOne

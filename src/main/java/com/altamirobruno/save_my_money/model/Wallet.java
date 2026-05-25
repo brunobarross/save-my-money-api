@@ -42,4 +42,5 @@ public class Wallet {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Transaction> transactions = new ArrayList<>();
 
+
 }

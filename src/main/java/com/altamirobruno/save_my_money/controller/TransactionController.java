@@ -25,19 +25,23 @@ public class TransactionController {
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @GetMapping
-    public List<TransactionDTO> getAll() {
-        return transactionService.getAll();
+    public List<TransactionDTO> getAll(
+            @RequestParam(name = "wallet", required = false) UUID walletId,
+            @RequestParam(name = "month", required = false) Integer month,
+            @RequestParam(name = "year", required = false) Integer year) {
+
+        return transactionService.getAll(walletId, month, year);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @GetMapping("/{id}")
-    public TransactionDTO getById(@PathVariable @NotNull UUID id){
+    public TransactionDTO getById(@PathVariable @NotNull UUID id) {
         return transactionService.getById(id);
     }
 
     @PutMapping("/{id}")
-    public TransactionDTO update(@PathVariable @NotNull UUID id, @RequestBody TransactionDTO transactionDTO){
-        return  transactionService.update(id, transactionDTO);
+    public TransactionDTO update(@PathVariable @NotNull UUID id, @RequestBody TransactionDTO transactionDTO) {
+        return transactionService.update(id, transactionDTO);
 
     }
 

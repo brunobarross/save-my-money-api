@@ -6,18 +6,18 @@ import com.altamirobruno.save_my_money.exceptions.ItemNotFoundException;
 import com.altamirobruno.save_my_money.model.Transaction;
 import com.altamirobruno.save_my_money.model.Wallet;
 import com.altamirobruno.save_my_money.repository.WalletRepository;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
-@Data
+@RequiredArgsConstructor
 @Component
 public class TransactionMapper {
     private final WalletRepository walletRepository;
-    public TransactionDTO toDTO(Transaction transaction){
+    private final WalletMapper walletMapper;
 
-        return new TransactionDTO(transaction.getId(), transaction.getName(), transaction.getValue(), transaction.getDescription(), transaction.getDate(), transaction.getInstallment(), transaction.getType(), transaction.getWallet());
+    public TransactionDTO toDTO(Transaction transaction){
+        WalletDTO walletDTO = transaction.getWallet() == null ? null : walletMapper.toDTO(transaction.getWallet());
+        return new TransactionDTO(transaction.getId(), transaction.getName(), transaction.getValue(), transaction.getDescription(), transaction.getDate(), transaction.getInstallment(), transaction.getType(), walletDTO);
     }
 
     public Transaction toEntity(TransactionDTO transactionDTO){
@@ -36,9 +36,9 @@ public class TransactionMapper {
         transaction.setDescription(transactionDTO.description());
         transaction.setType(transactionDTO.type());
         transaction.setValue(transactionDTO.value());
-        if (transactionDTO.wallet() != null && transactionDTO.wallet().getId() != null) {
-            Wallet wallet = walletRepository.findById(transactionDTO.wallet().getId())
-                    .orElseThrow(() -> new ItemNotFoundException(transactionDTO.wallet().getId()));
+        if (transactionDTO.wallet() != null && transactionDTO.wallet().id() != null) {
+            Wallet wallet = walletRepository.findById(transactionDTO.wallet().id())
+                    .orElseThrow(() -> new ItemNotFoundException(transactionDTO.wallet().id()));
             transaction.setWallet(wallet);
         }
         return transaction;
