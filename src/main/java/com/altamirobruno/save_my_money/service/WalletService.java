@@ -7,7 +7,6 @@ import com.altamirobruno.save_my_money.exceptions.ItemNotFoundException;
 import com.altamirobruno.save_my_money.repository.WalletRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 

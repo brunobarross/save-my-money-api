@@ -1,6 +1,7 @@
 package com.altamirobruno.save_my_money.dto;
 
 import com.altamirobruno.save_my_money.enums.TransactionType;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -13,7 +14,8 @@ public record TransactionDTO(
         LocalDate date,
         String installment,
         TransactionType type,
-        WalletDTO wallet
+        UUID walletId,
+        UUID userId
 ) {
 
 }

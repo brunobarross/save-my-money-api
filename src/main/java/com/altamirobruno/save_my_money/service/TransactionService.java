@@ -37,7 +37,7 @@ public class TransactionService {
                     .map(transactionMapper::toDTO)
                     .toList();
         }
-        if(month == null || year == null){
+        if (month == null || year == null) {
             return transactionRepository.findTransactionByWalletId(walletId)
                     .stream()
                     .map(transactionMapper::toDTO)
@@ -66,9 +66,9 @@ public class TransactionService {
                     item.setDescription(transactionDTO.description());
                     item.setValue(transactionDTO.value());
                     item.setInstallment(transactionDTO.installment());
-                    if (transactionDTO.wallet() != null && transactionDTO.wallet().id() != null) {
-                        Wallet wallet = walletRepository.findById(transactionDTO.wallet().id())
-                                .orElseThrow(() -> new ItemNotFoundException(transactionDTO.wallet().id()));
+                    if (transactionDTO.walletId() != null) {
+                        Wallet wallet = walletRepository.findById(transactionDTO.walletId())
+                                .orElseThrow(() -> new ItemNotFoundException(transactionDTO.walletId()));
                         item.setWallet(wallet);
                     }
                     return transactionRepository.save(item);

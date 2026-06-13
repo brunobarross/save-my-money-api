@@ -38,6 +38,11 @@ public class Transaction {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Wallet wallet;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", columnDefinition = "uuid", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private User user;
+
     @PrePersist
     public void prePersist() {
         if (this.date == null)

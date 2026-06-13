@@ -37,6 +37,10 @@ public class Wallet {
     @Column(name = "status", nullable = false)
     private Status status = Status.ACTIVE;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", columnDefinition = "uuid", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private User user;
 
     @OneToMany(mappedBy = "wallet", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

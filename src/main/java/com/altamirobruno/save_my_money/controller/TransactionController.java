@@ -1,18 +1,18 @@
 package com.altamirobruno.save_my_money.controller;
 
 import com.altamirobruno.save_my_money.dto.TransactionDTO;
-import com.altamirobruno.save_my_money.dto.WalletDTO;
 import com.altamirobruno.save_my_money.service.TransactionService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
+@Validated
 @RestController
 @RequestMapping("/api/transactions")
 public class TransactionController {
@@ -47,7 +47,7 @@ public class TransactionController {
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public TransactionDTO create(@RequestBody @Valid TransactionDTO transaction) {
+    public TransactionDTO create(@Valid @RequestBody TransactionDTO transaction) {
         return transactionService.create(transaction);
     }
 

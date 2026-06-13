@@ -21,7 +21,7 @@ public class JWTService {
 
     public String generateToken(Authentication authentication) {
         Instant now = Instant.now();
-        long expire = 18000L;
+        long expire = 180000L;
         String scopes = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
