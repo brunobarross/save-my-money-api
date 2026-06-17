@@ -13,4 +13,15 @@ public class UserMapper {
 
     }
 
+    public User toEntity(UserDTO userDTO) {
+        if (userDTO == null) {
+            return null;
+        }
+        User user = new User();
+
+        user.setUserId(userDTO.id());
+        user.setName(userDTO.name());
+        return user;
+    }
+
 }

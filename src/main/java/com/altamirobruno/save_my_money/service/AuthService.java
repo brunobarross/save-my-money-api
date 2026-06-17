@@ -17,12 +17,10 @@ import java.util.logging.Logger;
 @Service
 public class AuthService {
     private final JWTService jwtService;
-    private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
 
     public AuthService(JWTService jwtService, UserRepository userRepository, AuthenticationManager authenticationManager) {
         this.jwtService = jwtService;
-        this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
 
     }
