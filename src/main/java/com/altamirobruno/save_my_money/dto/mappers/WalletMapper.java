@@ -18,7 +18,7 @@ public class WalletMapper {
     public WalletDTO toDTO(Wallet wallet) {
         UserDTO userDTO = wallet.getUser() == null ? null : userMapper.toDTO(wallet.getUser());
         if (userDTO == null) throw new AssertionError();
-        return new WalletDTO(wallet.getId(), wallet.getName(), wallet.getColor(), userDTO.id());
+        return new WalletDTO(wallet.getId(), wallet.getName(), wallet.getColor(), userDTO.id(), wallet.getIcon());
 
     }
 
@@ -35,6 +35,7 @@ public class WalletMapper {
 
         wallet.setName(walletDTO.name());
         wallet.setColor(walletDTO.color());
+        wallet.setIcon(walletDTO.icon());
 
         if (walletDTO.userId() != null) {
             User user = userRepository.findById(walletDTO.userId())

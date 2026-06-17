@@ -1,4 +1,4 @@
-package com.altamirobruno.save_my_money.configs.security;
+package com.altamirobruno.save_my_money.service;
 
 import com.altamirobruno.save_my_money.model.User;
 import com.altamirobruno.save_my_money.repository.UserRepository;

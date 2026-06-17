@@ -1,5 +1,6 @@
 package com.altamirobruno.save_my_money.model;
 
+import com.altamirobruno.save_my_money.enums.IconType;
 import com.altamirobruno.save_my_money.enums.Status;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -31,6 +32,11 @@ public class Wallet {
     @NotEmpty
     @Column(name="color", nullable = false)
     private String color;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "icon", nullable = false)
+    private IconType icon;
 
     @NotNull
     @Enumerated(EnumType.STRING)
