@@ -2,10 +2,12 @@ package com.altamirobruno.save_my_money.model;
 
 import com.altamirobruno.save_my_money.enums.RoleName;
 import jakarta.persistence.*;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.UUID;
 
+@Data
 @Entity
 @Table(name = "tb_roles")
 public class Role  implements GrantedAuthority {
@@ -21,4 +23,6 @@ public class Role  implements GrantedAuthority {
     public String getAuthority() {
         return this.rolename.toString();
     }
+
+    public String getName() { return this.rolename.toString(); }
 }
