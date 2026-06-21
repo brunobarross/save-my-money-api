@@ -3,7 +3,6 @@ package com.altamirobruno.save_my_money.service;
 import com.altamirobruno.save_my_money.dto.LoginRequestDTO;
 import com.altamirobruno.save_my_money.dto.LoginResponseDTO;
 import com.altamirobruno.save_my_money.dto.UserDTO;
-import com.altamirobruno.save_my_money.dto.mappers.UserMapper;
 import com.altamirobruno.save_my_money.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,9 +11,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
 import java.util.logging.Logger;
 
 @Service
@@ -31,6 +32,7 @@ public class AuthService {
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.username(), loginRequestDTO.password()));
+
             return new LoginResponseDTO(
                     (User) authentication.getPrincipal(),
                     jwtService.generateToken(authentication)
