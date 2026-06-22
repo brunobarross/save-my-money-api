@@ -5,7 +5,7 @@ services:
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
     ports:
-      - '5435:5432'
+      - '5437:5432'
     environment:
       POSTGRES_DB: ${DB_NAME:-savemymoney}
       POSTGRES_USER: ${DB_USERNAME:-postgres}
@@ -13,7 +13,7 @@ services:
     networks:
       - app-network
   spring-app:
-    image: your-dockerhub-username/save-my-money:latest
+    image: docker.io/altamirobruno/save-my-money:latest
     container_name: spring_boot_app
     restart: always
     ports:
