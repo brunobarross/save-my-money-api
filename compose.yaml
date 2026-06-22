@@ -1,18 +1,55 @@
 services:
-  postgres:
+  postgres-db:
     image: postgres:16.6-alpine
+    container_name: production_postgres
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
     ports:
       - '5435:5432'
     environment:
-      - POSTGRES_PASSWORD=123456
+      POSTGRES_DB: ${DB_NAME:-savemymoney}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secretpassword}
+    networks:
+      - app-network
+  spring-app:
+    image: your-dockerhub-username/save-my-money:latest
+    container_name: spring_boot_app
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      # Injecting environment variables into Spring Boot
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/${DB_NAME:-savemymoney}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-secretpassword}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      - postgres-db
+    networks:
+      - app-network
+
   pgadmin:
     image: dpage/pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-      - PGADMIN_DEFAULT_PASSWORD=admin
+    container_name: production_pgadmin
+    restart: always
     ports:
       - '5050:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
     depends_on:
-      - postgres
+      - postgres-db
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  pgadmin-data:
+
+networks:
+  app-network:
+    driver: bridge
+
