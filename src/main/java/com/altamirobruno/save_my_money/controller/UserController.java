@@ -29,6 +29,7 @@ public class UserController {
         return userService.getAllUsers();
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/me")
     public UserDTO getLoggedInUser(@AuthenticationPrincipal Jwt jwt) {
         return userService.getUserLogged(jwt);
