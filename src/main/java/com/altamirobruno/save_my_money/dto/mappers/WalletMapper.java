@@ -9,16 +9,18 @@ import com.altamirobruno.save_my_money.repository.UserRepository;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Data
 @Component
 public class WalletMapper {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
 
-    public WalletDTO toDTO(Wallet wallet) {
+    public WalletDTO toDTO(Wallet wallet, BigDecimal amount) {
         UserDTO userDTO = wallet.getUser() == null ? null : userMapper.toDTO(wallet.getUser());
         if (userDTO == null) throw new AssertionError();
-        return new WalletDTO(wallet.getId(), wallet.getName(), wallet.getColor(), userDTO.id(), wallet.getIcon());
+        return new WalletDTO(wallet.getId(), wallet.getName(), wallet.getColor(), userDTO.id(), wallet.getIcon(), amount);
 
     }
 
@@ -36,7 +38,7 @@ public class WalletMapper {
         wallet.setName(walletDTO.name());
         wallet.setColor(walletDTO.color());
         wallet.setIcon(walletDTO.icon());
-
+        wallet.setAmount(walletDTO.amount());
         if (walletDTO.userId() != null) {
             User user = userRepository.findById(walletDTO.userId())
                     .orElseThrow(() -> new ItemNotFoundException(walletDTO.userId()));

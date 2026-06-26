@@ -26,7 +26,7 @@ public class TransactionController {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @GetMapping
     public List<TransactionDTO> getAll(
-            @RequestParam(name = "wallet", required = false) UUID walletId,
+            @RequestParam(name = "walletId", required = false) UUID walletId,
             @RequestParam(name = "month", required = false) Integer month,
             @RequestParam(name = "year", required = false) Integer year) {
 

@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -19,7 +20,7 @@ public class Transaction {
     private UUID id;
     private String name;
     @Column(name = "amount_value")
-    private Float value;
+    private BigDecimal value;
     private String description;
 
     @NotNull

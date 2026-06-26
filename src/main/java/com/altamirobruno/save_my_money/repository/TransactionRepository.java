@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,4 +23,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             @Param("year") int year);
 
     List<Transaction> findTransactionByWalletId(UUID walletId);
+
+    @Query("SELECT COALESCE(SUM(t.value), 0) FROM Transaction t WHERE t.wallet.id = :walletId")
+    BigDecimal getBalanceByWalletId(@Param("walletId") UUID walletId);
 }

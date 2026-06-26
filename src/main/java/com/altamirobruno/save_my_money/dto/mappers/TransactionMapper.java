@@ -21,7 +21,7 @@ public class TransactionMapper {
     private final UserMapper userMapper;
 
     public TransactionDTO toDTO(Transaction transaction) {
-        WalletDTO walletDTO = transaction.getWallet() == null ? null : walletMapper.toDTO(transaction.getWallet());
+        WalletDTO walletDTO = transaction.getWallet() == null ? null : walletMapper.toDTO(transaction.getWallet(), transaction.getWallet().getAmount());
         UserDTO userDTO = transaction.getUser() == null ? null : userMapper.toDTO(transaction.getUser());
         if (walletDTO == null || userDTO == null) return null;
         return new TransactionDTO(transaction.getId(), transaction.getName(), transaction.getValue(), transaction.getDescription(), transaction.getDate(), transaction.getInstallment(), transaction.getType(), walletDTO.id(), userDTO.id());

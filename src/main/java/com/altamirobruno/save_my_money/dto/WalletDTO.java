@@ -2,6 +2,7 @@ package com.altamirobruno.save_my_money.dto;
 
 import com.altamirobruno.save_my_money.enums.IconType;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public record WalletDTO(
@@ -9,6 +10,7 @@ public record WalletDTO(
   String name,
   String color,
   UUID userId,
-  IconType icon
+  IconType icon,
+  BigDecimal amount
 ) {
 }

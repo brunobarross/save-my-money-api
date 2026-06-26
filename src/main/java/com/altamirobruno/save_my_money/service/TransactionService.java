@@ -3,6 +3,7 @@ package com.altamirobruno.save_my_money.service;
 import com.altamirobruno.save_my_money.dto.TransactionDTO;
 import com.altamirobruno.save_my_money.dto.mappers.TransactionMapper;
 import com.altamirobruno.save_my_money.exceptions.ItemNotFoundException;
+import com.altamirobruno.save_my_money.model.Transaction;
 import com.altamirobruno.save_my_money.model.Wallet;
 import com.altamirobruno.save_my_money.repository.TransactionRepository;
 import com.altamirobruno.save_my_money.repository.WalletRepository;
@@ -75,6 +76,9 @@ public class TransactionService {
     }
 
     public void delete(@NotNull UUID id) {
-        transactionRepository.delete(transactionRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(id)));
+        if (transactionRepository.existsById(id)) {
+            transactionRepository.deleteById(id);
+        }
+        transactionRepository.deleteById(id);
     }
 }

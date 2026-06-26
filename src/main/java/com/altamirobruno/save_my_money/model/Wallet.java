@@ -10,6 +10,7 @@ import lombok.Data;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -33,9 +34,8 @@ public class Wallet {
     @Column(name="color", nullable = false)
     private String color;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "icon", nullable = false)
+    @Column(name = "icon")
     private IconType icon;
 
     @NotNull
@@ -51,6 +51,9 @@ public class Wallet {
     @OneToMany(mappedBy = "wallet", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Transaction> transactions = new ArrayList<>();
+
+    @Column(nullable = true)
+    private BigDecimal amount;
 
 
 }
