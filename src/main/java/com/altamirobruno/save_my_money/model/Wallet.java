@@ -52,8 +52,8 @@ public class Wallet {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Transaction> transactions = new ArrayList<>();
 
-    @Column(nullable = true)
-    private BigDecimal amount;
+    @Column(nullable = false)
+    private BigDecimal amount = BigDecimal.ZERO;
 
 
 }

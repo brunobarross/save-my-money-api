@@ -57,6 +57,9 @@ public class WalletService {
 
   public WalletDTO create(@Valid @NotNull WalletDTO walletDTO) {
     Wallet walletEntity = walletMapper.toEntity(walletDTO);
+    if(walletEntity.getAmount() == null){
+      walletEntity.setAmount(BigDecimal.ZERO);
+    }
     Wallet savedWallet = walletRepository.save(walletEntity);
     return walletMapper.toDTO(savedWallet, BigDecimal.ZERO);
   }

@@ -38,7 +38,7 @@ public class WalletMapper {
         wallet.setName(walletDTO.name());
         wallet.setColor(walletDTO.color());
         wallet.setIcon(walletDTO.icon());
-        wallet.setAmount(walletDTO.amount());
+        wallet.setAmount(walletDTO.amount() == null ? BigDecimal.ZERO : walletDTO.amount());
         if (walletDTO.userId() != null) {
             User user = userRepository.findById(walletDTO.userId())
                     .orElseThrow(() -> new ItemNotFoundException(walletDTO.userId()));
