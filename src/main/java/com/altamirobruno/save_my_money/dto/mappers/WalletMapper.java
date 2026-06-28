@@ -30,7 +30,6 @@ public class WalletMapper {
         }
 
         Wallet wallet = new Wallet();
-
         if (walletDTO.id() != null) {
             wallet.setId(walletDTO.id());
         }
