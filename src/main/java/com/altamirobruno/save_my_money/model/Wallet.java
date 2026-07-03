@@ -55,5 +55,4 @@ public class Wallet {
     @Column(nullable = false)
     private BigDecimal amount = BigDecimal.ZERO;
 
-
 }

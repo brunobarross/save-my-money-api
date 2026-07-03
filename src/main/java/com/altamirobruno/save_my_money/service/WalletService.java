@@ -37,7 +37,6 @@ public class WalletService {
 
   @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
   public List<WalletDTO> getAll() {
-
     List<WalletDTO> wallets =  walletRepository.findAll()
       .stream()
       .map((wallet)->{

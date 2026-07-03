@@ -24,6 +24,7 @@ public class Transaction {
     private String description;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TransactionType type = TransactionType.EXPENSE;
 

@@ -3,7 +3,6 @@ package com.altamirobruno.save_my_money.controller;
 
 import com.altamirobruno.save_my_money.dto.LoginRequestDTO;
 import com.altamirobruno.save_my_money.dto.LoginResponseDTO;
-import com.altamirobruno.save_my_money.dto.UserDTO;
 import com.altamirobruno.save_my_money.service.AuthService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
