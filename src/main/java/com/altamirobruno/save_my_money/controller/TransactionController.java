@@ -5,6 +5,7 @@ import com.altamirobruno.save_my_money.dto.FinancialSummaryProjection;
 import com.altamirobruno.save_my_money.dto.TransactionDTO;
 import com.altamirobruno.save_my_money.service.FinancialService;
 import com.altamirobruno.save_my_money.service.TransactionService;
+import com.altamirobruno.save_my_money.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.repository.query.Param;
@@ -26,25 +27,28 @@ public class TransactionController {
     private final FinancialService financialService;
 
 
-    public TransactionController(TransactionService transactionService, FinancialService financialService) {
+    public TransactionController(TransactionService transactionService, FinancialService financialService, UserService userService) {
         this.transactionService = transactionService;
         this.financialService = financialService;
+
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @GetMapping
     public List<TransactionDTO> getAll(
+            @AuthenticationPrincipal Jwt jwt,
             @RequestParam(name = "walletId", required = false) UUID walletId,
             @RequestParam(name = "month", required = false) Integer month,
-            @RequestParam(name = "year", required = false) Integer year) {
+            @RequestParam(name = "year", required = false) Integer year)
+    {
 
-        return transactionService.getAll(walletId, month, year);
+        return transactionService.getAll(walletId, month, year, jwt.getSubject());
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @GetMapping("/{id}")
-    public TransactionDTO getById(@PathVariable @NotNull UUID id) {
-        return transactionService.getById(id);
+    public TransactionDTO getById(@PathVariable @NotNull UUID id, @AuthenticationPrincipal Jwt jwt) {
+        return transactionService.getById(id, jwt.getSubject());
     }
 
 
@@ -55,21 +59,21 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    public TransactionDTO update(@PathVariable @NotNull UUID id, @RequestBody TransactionDTO transactionDTO) {
-        return transactionService.update(id, transactionDTO);
+    public TransactionDTO update(@PathVariable @NotNull UUID id, @RequestBody TransactionDTO transactionDTO, @AuthenticationPrincipal Jwt jwt) {
+        return transactionService.update(id, transactionDTO, jwt.getSubject());
 
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public TransactionDTO create(@Valid @RequestBody TransactionDTO transaction) {
-        return transactionService.create(transaction);
+    public TransactionDTO create(@Valid @RequestBody TransactionDTO transaction, @AuthenticationPrincipal Jwt jwt) {
+        return transactionService.create(transaction, jwt.getSubject());
     }
 
 
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
-        transactionService.delete(id);
+    public void delete(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        transactionService.delete(id, jwt.getSubject());
     }
 }

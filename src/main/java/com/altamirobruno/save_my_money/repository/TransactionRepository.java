@@ -3,6 +3,7 @@ package com.altamirobruno.save_my_money.repository;
 import com.altamirobruno.save_my_money.dto.FinancialSummaryDTO;
 import com.altamirobruno.save_my_money.dto.FinancialSummaryProjection;
 import com.altamirobruno.save_my_money.model.Transaction;
+import com.altamirobruno.save_my_money.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,14 +16,20 @@ import java.util.UUID;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
     @Query("SELECT t FROM Transaction t WHERE t.wallet.id = :walletId " +
+            "AND t.wallet.user.userId = :userId " +
             "AND EXTRACT(MONTH FROM t.date) = :month " +
             "AND EXTRACT(YEAR FROM t.date) = :year")
     List<Transaction> findTransactionByWalletIdAndMonthAndYear(
             @Param("walletId") UUID walletId,
             @Param("month") int month,
-            @Param("year") int year);
+            @Param("year") int year,
+            @Param("userId") UUID userId);
 
-    List<Transaction> findTransactionByWalletId(UUID walletId);
+
+    @Query("SELECT t FROM Transaction t WHERE t.wallet.id = :walletId AND t.wallet.user.userId = :userId")
+    List<Transaction> findTransactionByWalletId(@Param("walletId") UUID walletId, @Param("userId") UUID userId);
+
+    List<Transaction> findTransactionByUser(User user);
 
     @Query("SELECT COALESCE(SUM(t.value), 0) FROM Transaction t WHERE t.wallet.id = :walletId")
     BigDecimal getBalanceByWalletId(@Param("walletId") UUID walletId);
@@ -39,4 +46,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             "AND EXTRACT(YEAR FROM date) = :year",
             nativeQuery = true)
     FinancialSummaryProjection getFinancialSummary(@Param("month") int month, @Param("year") int year,  @Param("userId") UUID userId);
+
+
 }

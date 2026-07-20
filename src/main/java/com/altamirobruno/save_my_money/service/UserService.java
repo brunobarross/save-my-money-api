@@ -38,9 +38,17 @@ public class UserService {
                 .toList();
     }
 
+    public User findUserByName(String username){
+        return userRepository.findUserByName(username)
+                .orElseThrow(()-> new UsernameNotFoundException(username));
+    }
+
+
     public UserDTO createUser(UserDTO userDTO) {
         String encoderPassword = passwordEncoder.encode(userDTO.password());
         User newUser = userMapper.toEntity(new UserDTO(userDTO.id(),userDTO.name(), encoderPassword, userDTO.role()));
         return userMapper.toDTO(userRepository.save(newUser));
     }
+
+
 }

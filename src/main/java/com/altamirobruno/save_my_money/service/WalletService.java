@@ -12,8 +12,6 @@ import com.altamirobruno.save_my_money.repository.WalletRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,18 +24,13 @@ public class WalletService {
     private final WalletRepository walletRepository;
     private final WalletMapper walletMapper;
     private final TransactionRepository transactionRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public WalletService(WalletRepository walletRepository, WalletMapper walletMapper, TransactionRepository transactionRepository, UserRepository userRepository) {
+    public WalletService(WalletRepository walletRepository, WalletMapper walletMapper, TransactionRepository transactionRepository,  UserService userService) {
         this.walletRepository = walletRepository;
         this.walletMapper = walletMapper;
         this.transactionRepository = transactionRepository;
-        this.userRepository = userRepository;
-    }
-
-    private User runtimeUserLookup(String username) {
-        return userRepository.findUserByName(username)
-                .orElseThrow(() -> new RuntimeException("Authenticated user not found in database"));
+        this.userService = userService;
     }
 
 
@@ -46,19 +39,9 @@ public class WalletService {
     }
 
 
-    public List<WalletDTO> getAll() {
-        return walletRepository.findAll()
-                .stream()
-                .map((wallet) -> {
-                    BigDecimal amount = this.calculateBalance(wallet.getId());
-                    return walletMapper.toDTO(wallet, amount);
-                }).collect(Collectors.toList());
-    }
-
-
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
-    public List<WalletDTO> getMyAllWallets(String username) {
-        User user = runtimeUserLookup(username);
+    public List<WalletDTO> getAll(String username) {
+        User user = this.userService.findUserByName(username);
         return walletRepository.findByUser(user)
                 .stream()
                 .map((wallet) -> {
@@ -74,7 +57,7 @@ public class WalletService {
             return walletMapper.toDTO(walletItem, amount);
         }).orElseThrow(() -> new ItemNotFoundException(id));
 
-        User user = runtimeUserLookup(username);
+        User user = this.userService.findUserByName(username);
 
         if(!wallet.userId().equals(user.getUserId())){
             throw new RuntimeException("Access denied: You do not own this wallet");
@@ -84,7 +67,7 @@ public class WalletService {
     }
 
     public WalletDTO create(@Valid @NotNull WalletDTO walletDTO, String username) {
-        User user = runtimeUserLookup(username);
+        User user = this.userService.findUserByName(username);
         Wallet walletEntity = walletMapper.toEntity(walletDTO);
         if (walletEntity.getAmount() == null) {
             walletEntity.setAmount(BigDecimal.ZERO);
