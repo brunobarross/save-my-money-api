@@ -24,8 +24,8 @@ public class WalletController {
   }
 
   @GetMapping
-  public List<WalletDTO> getAll(@AuthenticationPrincipal Jwt jwt) {
-    return walletService.getAll(jwt.getSubject());
+  public List<WalletDTO> getAll(@AuthenticationPrincipal Jwt jwt, @RequestParam(name = "month", required = false) Integer month, @RequestParam(name = "year", required = false) Integer year) {
+    return walletService.getAll(jwt.getSubject(), month, year);
   }
 
   @GetMapping("/{id}")

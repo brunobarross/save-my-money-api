@@ -31,9 +31,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
 
     List<Transaction> findTransactionByUser(User user);
 
-    @Query("SELECT COALESCE(SUM(t.value), 0) FROM Transaction t WHERE t.wallet.id = :walletId")
-    BigDecimal getBalanceByWalletId(@Param("walletId") UUID walletId);
-
+    @Query("SELECT COALESCE(SUM(t.value), 0) FROM Transaction t WHERE t.wallet.id = :walletId " +
+            "AND MONTH(t.date) = :month AND YEAR(t.date) = :year")
+    BigDecimal getBalanceByWalletId(@Param("walletId") UUID walletId, @Param("month") int month, @Param("year") int year);
 
     @Query(value = "SELECT " +
             "COALESCE(SUM(CASE WHEN type = 'INCOME' THEN amount_value ELSE 0 END), 0) AS totalReceipts, " +

@@ -8,6 +8,7 @@ import com.altamirobruno.save_my_money.model.User;
 import com.altamirobruno.save_my_money.model.Wallet;
 import com.altamirobruno.save_my_money.repository.TransactionRepository;
 import com.altamirobruno.save_my_money.repository.WalletRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
@@ -69,6 +70,8 @@ public class TransactionService {
         return transactionDTO;
     }
 
+
+    @Transactional
     public TransactionDTO create(@Valid @NotNull TransactionDTO transaction, String username) {
         User user = this.userService.findUserByName(username);
         Transaction transactionEntity = transactionMapper.toEntity(transaction);
@@ -76,6 +79,7 @@ public class TransactionService {
         return transactionMapper.toDTO(transactionRepository.save(transactionEntity));
     }
 
+    @Transactional
     public TransactionDTO update(@NotNull UUID id, @Valid @NotNull TransactionDTO transactionDTO, String username) {
         Transaction transactionEntity = transactionMapper.toEntity(getById(id,username));
         transactionEntity.setName(transactionDTO.name());
@@ -90,6 +94,7 @@ public class TransactionService {
 
     }
 
+    @Transactional
     public void delete(@NotNull UUID id, String username) {
         Transaction transaction = transactionMapper.toEntity(getById(id,username));
         transactionRepository.delete(transaction);

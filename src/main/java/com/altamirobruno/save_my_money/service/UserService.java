@@ -4,6 +4,7 @@ import com.altamirobruno.save_my_money.dto.UserDTO;
 import com.altamirobruno.save_my_money.dto.mappers.UserMapper;
 import com.altamirobruno.save_my_money.model.User;
 import com.altamirobruno.save_my_money.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,6 +45,7 @@ public class UserService {
     }
 
 
+    @Transactional
     public UserDTO createUser(UserDTO userDTO) {
         String encoderPassword = passwordEncoder.encode(userDTO.password());
         User newUser = userMapper.toEntity(new UserDTO(userDTO.id(),userDTO.name(), encoderPassword, userDTO.role()));
