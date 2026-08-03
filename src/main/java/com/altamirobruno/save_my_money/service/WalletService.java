@@ -34,6 +34,12 @@ public class WalletService {
     }
 
     public BigDecimal calculateBalance(UUID walletId, Integer month, Integer year) {
+        if (month == null || year == null) {
+            LocalDate now = LocalDate.now();
+            month = (month == null) ? now.getMonthValue() : month;
+            year = (year == null) ? now.getYear() : year;
+        }
+
         return transactionRepository.getBalanceByWalletId(walletId, month, year);
     }
 
