@@ -1,6 +1,7 @@
 package com.altamirobruno.save_my_money.service;
 
 import com.altamirobruno.save_my_money.dto.TransactionDTO;
+import com.altamirobruno.save_my_money.dto.TransactionsPageDTO;
 import com.altamirobruno.save_my_money.dto.mappers.TransactionMapper;
 import com.altamirobruno.save_my_money.exceptions.ItemNotFoundException;
 import com.altamirobruno.save_my_money.model.Transaction;
@@ -11,11 +12,15 @@ import com.altamirobruno.save_my_money.repository.WalletRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Validated
@@ -34,27 +39,24 @@ public class TransactionService {
     }
 
 
-    public List<TransactionDTO> getAll(UUID walletId, Integer month, Integer year, String username) {
+    public TransactionsPageDTO getAll(UUID walletId, Integer month, Integer year, String username, int pageNumber, int pageSize) {
         User user = this.userService.findUserByName(username);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<Transaction> page;
 
-        if (walletId == null) {
-            return transactionRepository.findTransactionByUser(user)
-                    .stream()
-                    .map(transactionMapper::toDTO)
-                    .toList();
-        }
-        if (month == null || year == null) {
-            return transactionRepository.findTransactionByWalletId(walletId, user.getUserId())
-                    .stream()
-                    .map(transactionMapper::toDTO)
-                    .toList();
-
+        if (walletId != null && month != null && year != null) {
+            page = transactionRepository.findTransactionByWalletIdAndMonthAndYear(walletId, month, year, user.getUserId(), pageable);
+        } else if (month != null && year != null) {
+            page = transactionRepository.findTransactionByMonthAndYear(month, year, user.getUserId(), pageable);
+        } else if (walletId != null) {
+            page = transactionRepository.findTransactionByWalletId(walletId, user.getUserId(), pageable);
+        } else {
+            page = transactionRepository.findTransactionByUserId(user.getUserId(), pageable);
         }
 
-        return transactionRepository.findTransactionByWalletIdAndMonthAndYear(walletId, month, year, user.getUserId())
-                .stream()
-                .map(transactionMapper::toDTO)
-                .toList();
+        List<TransactionDTO> transactions = page.get().map(transactionMapper::toDTO).toList();
+
+        return new TransactionsPageDTO(transactions, page.getNumber(), page.getSize(), page.getTotalPages(), page.getTotalPages());
 
 
     }
@@ -64,7 +66,7 @@ public class TransactionService {
 
         User user = this.userService.findUserByName(username);
 
-        if(!transactionDTO.userId().equals(user.getUserId())) {
+        if (!transactionDTO.userId().equals(user.getUserId())) {
             throw new RuntimeException("Access denied: You do not own this transaction");
         }
         return transactionDTO;
@@ -81,13 +83,13 @@ public class TransactionService {
 
     @Transactional
     public TransactionDTO update(@NotNull UUID id, @Valid @NotNull TransactionDTO transactionDTO, String username) {
-        Transaction transactionEntity = transactionMapper.toEntity(getById(id,username));
+        Transaction transactionEntity = transactionMapper.toEntity(getById(id, username));
         transactionEntity.setName(transactionDTO.name());
         transactionEntity.setDescription(transactionDTO.description());
         transactionEntity.setValue(transactionDTO.value());
         transactionEntity.setInstallment(transactionDTO.installment());
-        if(transactionDTO.walletId() != null) {
-            Wallet wallet = walletRepository.findById(transactionDTO.walletId()).orElseThrow(()-> new ItemNotFoundException(transactionDTO.walletId()));
+        if (transactionDTO.walletId() != null) {
+            Wallet wallet = walletRepository.findById(transactionDTO.walletId()).orElseThrow(() -> new ItemNotFoundException(transactionDTO.walletId()));
             transactionEntity.setWallet(wallet);
         }
         return transactionMapper.toDTO(transactionEntity);
@@ -96,7 +98,7 @@ public class TransactionService {
 
     @Transactional
     public void delete(@NotNull UUID id, String username) {
-        Transaction transaction = transactionMapper.toEntity(getById(id,username));
+        Transaction transaction = transactionMapper.toEntity(getById(id, username));
         transactionRepository.delete(transaction);
     }
 }

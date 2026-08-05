@@ -1,16 +1,17 @@
 package com.altamirobruno.save_my_money.repository;
 
-import com.altamirobruno.save_my_money.dto.FinancialSummaryDTO;
 import com.altamirobruno.save_my_money.dto.FinancialSummaryProjection;
 import com.altamirobruno.save_my_money.model.Transaction;
 import com.altamirobruno.save_my_money.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -19,17 +20,28 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             "AND t.wallet.user.userId = :userId " +
             "AND EXTRACT(MONTH FROM t.date) = :month " +
             "AND EXTRACT(YEAR FROM t.date) = :year")
-    List<Transaction> findTransactionByWalletIdAndMonthAndYear(
+    Page<Transaction> findTransactionByWalletIdAndMonthAndYear(
             @Param("walletId") UUID walletId,
             @Param("month") int month,
             @Param("year") int year,
-            @Param("userId") UUID userId);
+            @Param("userId") UUID userId,
+            Pageable pageable);
 
+    @Query("SELECT t FROM Transaction t " +
+            "WHERE t.wallet.user.userId = :userId " +
+            "AND EXTRACT(MONTH FROM t.date) = :month " +
+            "AND EXTRACT(YEAR FROM t.date) = :year")
+    Page<Transaction> findTransactionByMonthAndYear(
+            @Param("month") int month,
+            @Param("year") int year,
+            @Param("userId") UUID userId,
+            Pageable pageable);
 
     @Query("SELECT t FROM Transaction t WHERE t.wallet.id = :walletId AND t.wallet.user.userId = :userId")
-    List<Transaction> findTransactionByWalletId(@Param("walletId") UUID walletId, @Param("userId") UUID userId);
+    Page<Transaction> findTransactionByWalletId(@Param("walletId") UUID walletId, @Param("userId") UUID userId, Pageable pageable);
 
-    List<Transaction> findTransactionByUser(User user);
+    @Query("SELECT t FROM Transaction t WHERE t.wallet.user.userId = :userId")
+    Page<Transaction> findTransactionByUserId(@Param("userId") UUID userId, Pageable pageable);
 
     @Query("SELECT COALESCE(SUM(t.value), 0) FROM Transaction t WHERE t.wallet.id = :walletId " +
             "AND MONTH(t.date) = :month AND YEAR(t.date) = :year")
@@ -46,6 +58,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             "AND EXTRACT(YEAR FROM date) = :year",
             nativeQuery = true)
     FinancialSummaryProjection getFinancialSummary(@Param("month") int month, @Param("year") int year,  @Param("userId") UUID userId);
-
 
 }

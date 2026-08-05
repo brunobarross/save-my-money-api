@@ -3,11 +3,13 @@ package com.altamirobruno.save_my_money.controller;
 import com.altamirobruno.save_my_money.dto.FinancialSummaryDTO;
 import com.altamirobruno.save_my_money.dto.FinancialSummaryProjection;
 import com.altamirobruno.save_my_money.dto.TransactionDTO;
+import com.altamirobruno.save_my_money.dto.TransactionsPageDTO;
 import com.altamirobruno.save_my_money.service.FinancialService;
 import com.altamirobruno.save_my_money.service.TransactionService;
 import com.altamirobruno.save_my_money.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,14 +37,18 @@ public class TransactionController {
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @GetMapping
-    public List<TransactionDTO> getAll(
+    public TransactionsPageDTO getAll(
             @AuthenticationPrincipal Jwt jwt,
             @RequestParam(name = "walletId", required = false) UUID walletId,
             @RequestParam(name = "month", required = false) Integer month,
-            @RequestParam(name = "year", required = false) Integer year)
+            @RequestParam(name = "year", required = false) Integer year,
+            @RequestParam(name = "page", defaultValue = "0", required = false) @PositiveOrZero int pageNumber,
+            @RequestParam(name = "pageSize", defaultValue = "10", required = false) @PositiveOrZero int pageSize
+            )
+
     {
 
-        return transactionService.getAll(walletId, month, year, jwt.getSubject());
+        return transactionService.getAll(walletId, month, year, jwt.getSubject(), pageNumber, pageSize);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
