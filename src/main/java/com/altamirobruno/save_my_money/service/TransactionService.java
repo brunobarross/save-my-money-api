@@ -108,9 +108,30 @@ public class TransactionService {
     }
 
     @Transactional
-    public void delete(@NotNull UUID id, String username) {
+    public void delete(@NotNull UUID id, String scope, String username) {
         Transaction transaction = getTransactionEntityAndCheckOwnership(id, username);
-        transactionRepository.delete(transaction);
+
+        if (scope == null || scope.equalsIgnoreCase("SINGLE") || transaction.getRecurrenceGroupId() == null) {
+            transactionRepository.delete(transaction);
+            return;
+        }
+
+        User user = userService.findUserByName(username);
+
+        if (scope.equalsIgnoreCase("FUTURE")) {
+            transactionRepository.deleteFutureInstallments(
+                    transaction.getRecurrenceGroupId(),
+                    transaction.getDate(),
+                    user.getUserId()
+            );
+        } else if (scope.equalsIgnoreCase("ALL")) {
+            transactionRepository.deleteAllInGroup(
+                    transaction.getRecurrenceGroupId(),
+                    user.getUserId()
+            );
+        } else {
+            transactionRepository.delete(transaction);
+        }
     }
 
 

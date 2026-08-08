@@ -79,13 +79,17 @@ public class TransactionController {
 
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
-        transactionService.delete(id, jwt.getSubject());
+    public void delete(
+            @PathVariable UUID id,
+            @RequestParam(name = "scope", defaultValue = "SINGLE", required = false) String scope,
+            @AuthenticationPrincipal Jwt jwt) {
+        transactionService.delete(id, scope, jwt.getSubject());
     }
 
     @PostMapping("/{id}/copy")
+    @ResponseStatus(code = HttpStatus.CREATED)
     public TransactionDTO copyTransaction(
-            @PathVariable UUID transactionID,
+            @PathVariable("id") UUID transactionID,
             @RequestParam int targetMonth,
             @RequestParam int targetYear,
             @AuthenticationPrincipal Jwt jwt) {

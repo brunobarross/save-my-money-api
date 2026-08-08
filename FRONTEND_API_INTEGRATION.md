@@ -338,11 +338,25 @@ export interface FinancialSummaryDTO {
 - **Request Body**: `TransactionDTO`
 - **Response**: `200 OK` -> `TransactionDTO`
 
-#### Delete Transaction
+#### Delete Transaction (Single, Future, or All in Group)
 `DELETE /api/transactions/{id}`
 - **Auth Required**: Yes
-- **Path Parameter**: `id` *(UUID)*
+- **Path Parameter**: `id` *(UUID)*: The ID of the transaction to delete
+- **Query Parameters**:
+  - `scope` *(optional, string, default: `"SINGLE"`)*: Scope of deletion for recurrence groups:
+    - `"SINGLE"`: Deletes only this specific transaction.
+    - `"FUTURE"`: Deletes this transaction and all subsequent installments in the same group (`recurrenceGroupId`).
+    - `"ALL"`: Deletes all installments in the same group (`recurrenceGroupId`).
 - **Response**: `204 No Content`
+
+#### Copy Transaction to Another Month
+`POST /api/transactions/{id}/copy`
+- **Auth Required**: Yes (`ROLE_USER` or `ROLE_ADMIN`)
+- **Path Parameter**: `id` *(UUID)*: The ID of the transaction to copy
+- **Query Parameters**:
+  - `targetMonth` *(required, integer)*: Target month number (1-12)
+  - `targetYear` *(required, integer)*: Target year (e.g. 2026)
+- **Response**: `201 Created` -> `TransactionDTO` (returns the newly created transaction in the target month)
 
 ---
 
@@ -481,8 +495,17 @@ export const TransactionService = {
     return data;
   },
 
-  deleteTransaction: async (id: string): Promise<void> => {
-    await api.delete(`/api/transactions/${id}`);
+  copyTransaction: async (id: string, targetMonth: number, targetYear: number): Promise<TransactionDTO> => {
+    const { data } = await api.post<TransactionDTO>(`/api/transactions/${id}/copy`, null, {
+      params: { targetMonth, targetYear },
+    });
+    return data;
+  },
+
+  deleteTransaction: async (id: string, scope: 'SINGLE' | 'FUTURE' | 'ALL' = 'SINGLE'): Promise<void> => {
+    await api.delete(`/api/transactions/${id}`, {
+      params: { scope },
+    });
   },
 };
 ```
