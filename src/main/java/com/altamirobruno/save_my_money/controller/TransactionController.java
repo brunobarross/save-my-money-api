@@ -82,4 +82,14 @@ public class TransactionController {
     public void delete(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
         transactionService.delete(id, jwt.getSubject());
     }
+
+    @PostMapping("/{id}/copy")
+    public TransactionDTO copyTransaction(
+            @PathVariable UUID transactionID,
+            @RequestParam int targetMonth,
+            @RequestParam int targetYear,
+            @AuthenticationPrincipal Jwt jwt) {
+        return transactionService.copyTransaction(transactionID, targetMonth, targetYear, jwt.getSubject());
+    }
+
 }

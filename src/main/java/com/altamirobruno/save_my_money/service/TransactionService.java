@@ -20,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -72,14 +73,8 @@ public class TransactionService {
     }
 
     public TransactionDTO getById(@NotNull UUID id, String username) {
-        TransactionDTO transactionDTO = transactionRepository.findById(id).map(transactionMapper::toDTO).orElseThrow(() -> new ItemNotFoundException(id));
-
-        User user = this.userService.findUserByName(username);
-
-        if (!transactionDTO.userId().equals(user.getUserId())) {
-            throw new RuntimeException("Access denied: You do not own this transaction");
-        }
-        return transactionDTO;
+        Transaction transaction = getTransactionEntityAndCheckOwnership(id, username);
+        return transactionMapper.toDTO(transaction);
     }
 
 
@@ -96,14 +91,13 @@ public class TransactionService {
         List<Transaction> installments = this.createInstallments(transactionDTO, user, transactionDTO.installmentCount());
 
         List<Transaction> savedTransactions = transactionRepository.saveAll(installments);
-        System.out.println(savedTransactions);
         return transactionMapper.toDTO(savedTransactions.getFirst());
 
     }
 
     @Transactional
     public TransactionDTO update(@NotNull UUID id, @Valid @NotNull TransactionDTO transactionDTO, String username) {
-        Transaction transactionEntity = transactionMapper.toEntity(getById(id, username));
+        Transaction transactionEntity = getTransactionEntityAndCheckOwnership(id, username);
         transactionEntity.setName(transactionDTO.name());
         transactionEntity.setDescription(transactionDTO.description());
         transactionEntity.setValue(transactionDTO.value());
@@ -115,7 +109,7 @@ public class TransactionService {
 
     @Transactional
     public void delete(@NotNull UUID id, String username) {
-        Transaction transaction = transactionMapper.toEntity(getById(id, username));
+        Transaction transaction = getTransactionEntityAndCheckOwnership(id, username);
         transactionRepository.delete(transaction);
     }
 
@@ -141,5 +135,40 @@ public class TransactionService {
             transactionsList.add(transaction);
         }
         return transactionsList;
+    }
+
+    @Transactional
+    public TransactionDTO copyTransaction(UUID transactionID, int targetMonth, int targetYear, String username){
+        Transaction originTransaction = getTransactionEntityAndCheckOwnership(transactionID, username);
+        LocalDate originDate = originTransaction.getDate() != null ? originTransaction.getDate() : LocalDate.now();
+        LocalDate targetDate = originDate.withMonth(targetMonth).withYear(targetYear);
+
+        Transaction targetTransaction = new Transaction();
+        targetTransaction.setName(originTransaction.getName());
+        targetTransaction.setDescription(originTransaction.getDescription());
+        targetTransaction.setValue(originTransaction.getValue());
+        targetTransaction.setType(originTransaction.getType());
+        targetTransaction.setRecurrenceGroupId(originTransaction.getRecurrenceGroupId());
+        targetTransaction.setDate(targetDate);
+        if (originTransaction.getWallet() != null) {
+            targetTransaction.setWallet(getWalletById(originTransaction.getWallet().getId()));
+        }
+        targetTransaction.setInstallment(originTransaction.getInstallment());
+        targetTransaction.setUser(originTransaction.getUser());
+        return transactionMapper.toDTO(transactionRepository.save(targetTransaction));
+
+    }
+
+    private Transaction getTransactionEntityAndCheckOwnership(UUID id, String username) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException(id));
+
+        User user = this.userService.findUserByName(username);
+
+        if (!transaction.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Access denied: You do not own this transaction");
+        }
+
+        return transaction;
     }
 }
