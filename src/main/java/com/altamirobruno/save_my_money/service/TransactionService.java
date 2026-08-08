@@ -18,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -36,6 +38,14 @@ public class TransactionService {
         this.transactionMapper = transactionMapper;
         this.walletRepository = walletRepository;
         this.userService = userService;
+    }
+
+    private Wallet getWalletById(UUID walletId) {
+        if (walletId == null) {
+            return null;
+        }
+        return walletRepository.findById(walletId)
+                .orElseThrow(() -> new ItemNotFoundException(walletId));
     }
 
 
@@ -74,11 +84,21 @@ public class TransactionService {
 
 
     @Transactional
-    public TransactionDTO create(@Valid @NotNull TransactionDTO transaction, String username) {
+    public TransactionDTO create(@Valid @NotNull TransactionDTO transactionDTO, String username) {
         User user = this.userService.findUserByName(username);
-        Transaction transactionEntity = transactionMapper.toEntity(transaction);
-        transactionEntity.setUser(user);
-        return transactionMapper.toDTO(transactionRepository.save(transactionEntity));
+
+        if(transactionDTO.installmentCount() == null || transactionDTO.installmentCount() == 0) {
+            Transaction transactionEntity = transactionMapper.toEntity(transactionDTO);
+            transactionEntity.setUser(user);
+            return transactionMapper.toDTO(transactionRepository.save(transactionEntity));
+        }
+
+        List<Transaction> installments = this.createInstallments(transactionDTO, user, transactionDTO.installmentCount());
+
+        List<Transaction> savedTransactions = transactionRepository.saveAll(installments);
+        System.out.println(savedTransactions);
+        return transactionMapper.toDTO(savedTransactions.getFirst());
+
     }
 
     @Transactional
@@ -88,10 +108,7 @@ public class TransactionService {
         transactionEntity.setDescription(transactionDTO.description());
         transactionEntity.setValue(transactionDTO.value());
         transactionEntity.setInstallment(transactionDTO.installment());
-        if (transactionDTO.walletId() != null) {
-            Wallet wallet = walletRepository.findById(transactionDTO.walletId()).orElseThrow(() -> new ItemNotFoundException(transactionDTO.walletId()));
-            transactionEntity.setWallet(wallet);
-        }
+        transactionEntity.setWallet(getWalletById(transactionDTO.walletId()));
         return transactionMapper.toDTO(transactionEntity);
 
     }
@@ -100,5 +117,29 @@ public class TransactionService {
     public void delete(@NotNull UUID id, String username) {
         Transaction transaction = transactionMapper.toEntity(getById(id, username));
         transactionRepository.delete(transaction);
+    }
+
+
+    private List<Transaction> createInstallments(TransactionDTO transactionDTO, User user, int totalInstallments) {
+        LocalDate baseDate = transactionDTO.date() == null ? LocalDate.now() : transactionDTO.date();
+        UUID groupId = UUID.randomUUID();
+
+        List<Transaction> transactionsList = new ArrayList<>();
+        Wallet wallet = getWalletById(transactionDTO.walletId());
+
+        for(int i = 0; i < totalInstallments; i++) {
+            Transaction transaction = new Transaction();
+            transaction.setName(transactionDTO.name());
+            transaction.setDescription(transactionDTO.description());
+            transaction.setValue(transactionDTO.value());
+            transaction.setType(transactionDTO.type());
+            transaction.setRecurrenceGroupId(groupId);
+            transaction.setDate(baseDate.plusMonths(i));
+            transaction.setUser(user);
+            transaction.setInstallment((i + 1) + "/" + totalInstallments);
+            transaction.setWallet(wallet);
+            transactionsList.add(transaction);
+        }
+        return transactionsList;
     }
 }

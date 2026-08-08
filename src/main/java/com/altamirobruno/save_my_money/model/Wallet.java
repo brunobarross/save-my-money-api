@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -15,8 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Data
+
 @Entity
+@Getter
+@Setter
 @Table(name = "tb_wallets")
 @SQLDelete(sql = "UPDATE tb_wallets SET status = 'DISABLED' WHERE id = ?::uuid")
 @SQLRestriction("status = 'ACTIVE'")

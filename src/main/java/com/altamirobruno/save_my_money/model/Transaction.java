@@ -6,14 +6,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "tb_transactions")
+@ToString
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -42,6 +47,9 @@ public class Transaction {
     @JoinColumn(name = "user_id", columnDefinition = "uuid", nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private User user;
+
+    @Column(name = "recurrence_group_id", columnDefinition = "uuid")
+    private UUID recurrenceGroupId;
 
     @PrePersist
     public void prePersist() {

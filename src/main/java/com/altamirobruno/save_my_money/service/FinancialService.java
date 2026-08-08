@@ -4,14 +4,11 @@ import com.altamirobruno.save_my_money.dto.FinancialSummaryDTO;
 import com.altamirobruno.save_my_money.dto.FinancialSummaryProjection;
 import com.altamirobruno.save_my_money.dto.UserDTO;
 import com.altamirobruno.save_my_money.repository.TransactionRepository;
-import com.altamirobruno.save_my_money.repository.WalletRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.UUID;
 
 @Service
 public class FinancialService {
