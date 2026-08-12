@@ -1,7 +1,6 @@
 package com.altamirobruno.save_my_money.controller;
 
 import com.altamirobruno.save_my_money.dto.FinancialSummaryDTO;
-import com.altamirobruno.save_my_money.dto.FinancialSummaryProjection;
 import com.altamirobruno.save_my_money.dto.TransactionDTO;
 import com.altamirobruno.save_my_money.dto.TransactionsPageDTO;
 import com.altamirobruno.save_my_money.service.FinancialService;
@@ -10,15 +9,12 @@ import com.altamirobruno.save_my_money.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 import java.util.UUID;
 
 @Validated
@@ -28,8 +24,8 @@ public class TransactionController {
     private final TransactionService transactionService;
     private final FinancialService financialService;
 
-
-    public TransactionController(TransactionService transactionService, FinancialService financialService, UserService userService) {
+    public TransactionController(TransactionService transactionService, FinancialService financialService,
+            UserService userService) {
         this.transactionService = transactionService;
         this.financialService = financialService;
 
@@ -43,12 +39,18 @@ public class TransactionController {
             @RequestParam(name = "month", required = false) Integer month,
             @RequestParam(name = "year", required = false) Integer year,
             @RequestParam(name = "page", defaultValue = "0", required = false) @PositiveOrZero int pageNumber,
-            @RequestParam(name = "pageSize", defaultValue = "10", required = false) @PositiveOrZero int pageSize
-            )
+            @RequestParam(name = "pageSize", defaultValue = "10", required = false) @PositiveOrZero int pageSize)
 
     {
 
         return transactionService.getAll(walletId, month, year, jwt.getSubject(), pageNumber, pageSize);
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
+    @GetMapping("/summary")
+    public FinancialSummaryDTO getFinancialSummary(@NotNull int month, @NotNull int year,
+            @AuthenticationPrincipal Jwt jwt) {
+        return financialService.getFinancialSummary(month, year, jwt);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
@@ -57,15 +59,9 @@ public class TransactionController {
         return transactionService.getById(id, jwt.getSubject());
     }
 
-
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
-    @GetMapping("/summary")
-    public FinancialSummaryDTO getFinancialSummary(@NotNull int month, @NotNull int year, @AuthenticationPrincipal Jwt jwt) {
-        return  financialService.getFinancialSummary(month, year, jwt);
-    }
-
     @PutMapping("/{id}")
-    public TransactionDTO update(@PathVariable @NotNull UUID id, @RequestBody TransactionDTO transactionDTO, @AuthenticationPrincipal Jwt jwt) {
+    public TransactionDTO update(@PathVariable @NotNull UUID id, @RequestBody TransactionDTO transactionDTO,
+            @AuthenticationPrincipal Jwt jwt) {
         return transactionService.update(id, transactionDTO, jwt.getSubject());
 
     }
@@ -75,7 +71,6 @@ public class TransactionController {
     public TransactionDTO create(@Valid @RequestBody TransactionDTO transaction, @AuthenticationPrincipal Jwt jwt) {
         return transactionService.create(transaction, jwt.getSubject());
     }
-
 
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")

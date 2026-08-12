@@ -30,7 +30,7 @@ public class Transaction {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "type", nullable = false)
     private TransactionType type = TransactionType.EXPENSE;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
@@ -57,4 +57,3 @@ public class Transaction {
             this.date = LocalDate.now();
     }
 }
-
