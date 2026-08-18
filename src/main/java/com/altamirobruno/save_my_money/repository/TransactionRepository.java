@@ -58,8 +58,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             "FROM tb_transactions " +
             "WHERE user_id = CAST(:userId AS uuid) " +
             "AND EXTRACT(MONTH FROM date) = :month " +
-            "AND EXTRACT(YEAR FROM date) = :year" +
-            "AND ",
+            "AND EXTRACT(YEAR FROM date) = :year",
             nativeQuery = true)
     FinancialSummaryProjection getFinancialSummary(@Param("month") int month, @Param("year") int year,  @Param("userId") UUID userId);
 
