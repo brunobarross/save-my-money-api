@@ -45,8 +45,17 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     @Query("SELECT t FROM Transaction t WHERE t.wallet.user.userId = :userId")
     Page<Transaction> findTransactionByUserId(@Param("userId") UUID userId, Pageable pageable);
 
-    @Query("SELECT COALESCE(SUM(t.value), 0) FROM Transaction t WHERE t.wallet.id = :walletId " +
-            "AND MONTH(t.date) = :month AND YEAR(t.date) = :year")
+    @Query("""
+        SELECT COALESCE(SUM(
+            CASE WHEN t.type = com.altamirobruno.save_my_money.enums.TransactionType.EXPENSE 
+                 THEN t.value 
+                 ELSE -t.value 
+            END), 0) 
+        FROM Transaction t 
+        WHERE t.wallet.id = :walletId 
+          AND MONTH(t.date) = :month 
+          AND YEAR(t.date) = :year
+    """)
     BigDecimal getBalanceByWalletId(@Param("walletId") UUID walletId, @Param("month") int month, @Param("year") int year);
 
     @Query(value = "SELECT " +
@@ -57,7 +66,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             "FROM tb_transactions " +
             "WHERE user_id = CAST(:userId AS uuid) " +
             "AND EXTRACT(MONTH FROM date) = :month " +
-            "AND EXTRACT(YEAR FROM date) = :year",
+            "AND EXTRACT(YEAR FROM date) = :year" +
+            "AND ",
             nativeQuery = true)
     FinancialSummaryProjection getFinancialSummary(@Param("month") int month, @Param("year") int year,  @Param("userId") UUID userId);
 

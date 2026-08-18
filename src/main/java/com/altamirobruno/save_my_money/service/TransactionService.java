@@ -3,6 +3,7 @@ package com.altamirobruno.save_my_money.service;
 import com.altamirobruno.save_my_money.dto.TransactionDTO;
 import com.altamirobruno.save_my_money.dto.TransactionsPageDTO;
 import com.altamirobruno.save_my_money.dto.mappers.TransactionMapper;
+import com.altamirobruno.save_my_money.enums.DeleteScope;
 import com.altamirobruno.save_my_money.exceptions.ItemNotFoundException;
 import com.altamirobruno.save_my_money.model.Transaction;
 import com.altamirobruno.save_my_money.model.User;
@@ -20,10 +21,8 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Validated
@@ -82,7 +81,7 @@ public class TransactionService {
     public TransactionDTO create(@Valid @NotNull TransactionDTO transactionDTO, String username) {
         User user = this.userService.findUserByName(username);
 
-        if(transactionDTO.installmentCount() == null || transactionDTO.installmentCount() == 0) {
+        if (transactionDTO.installmentCount() == null || transactionDTO.installmentCount() == 0) {
             Transaction transactionEntity = transactionMapper.toEntity(transactionDTO);
             transactionEntity.setUser(user);
             return transactionMapper.toDTO(transactionRepository.save(transactionEntity));
@@ -111,27 +110,30 @@ public class TransactionService {
     public void delete(@NotNull UUID id, String scope, String username) {
         Transaction transaction = getTransactionEntityAndCheckOwnership(id, username);
 
-        if (scope == null || scope.equalsIgnoreCase("SINGLE") || transaction.getRecurrenceGroupId() == null) {
+        if (scope == null || scope.equalsIgnoreCase(DeleteScope.SINGLE.name()) || transaction.getRecurrenceGroupId() == null) {
             transactionRepository.delete(transaction);
             return;
         }
 
         User user = userService.findUserByName(username);
 
-        if (scope.equalsIgnoreCase("FUTURE")) {
+        if (scope.equalsIgnoreCase(DeleteScope.FUTURE.name())) {
             transactionRepository.deleteFutureInstallments(
                     transaction.getRecurrenceGroupId(),
                     transaction.getDate(),
                     user.getUserId()
             );
-        } else if (scope.equalsIgnoreCase("ALL")) {
+
+            return;
+
+        } else if (scope.equalsIgnoreCase(DeleteScope.ALL.name())) {
             transactionRepository.deleteAllInGroup(
                     transaction.getRecurrenceGroupId(),
                     user.getUserId()
             );
-        } else {
-            transactionRepository.delete(transaction);
+            return;
         }
+        transactionRepository.delete(transaction);
     }
 
 
@@ -142,7 +144,7 @@ public class TransactionService {
         List<Transaction> transactionsList = new ArrayList<>();
         Wallet wallet = getWalletById(transactionDTO.walletId());
 
-        for(int i = 0; i < totalInstallments; i++) {
+        for (int i = 0; i < totalInstallments; i++) {
             Transaction transaction = new Transaction();
             transaction.setName(transactionDTO.name());
             transaction.setDescription(transactionDTO.description());
@@ -159,7 +161,7 @@ public class TransactionService {
     }
 
     @Transactional
-    public TransactionDTO copyTransaction(UUID transactionID, int targetMonth, int targetYear, String username){
+    public TransactionDTO copyTransaction(UUID transactionID, int targetMonth, int targetYear, String username) {
         Transaction originTransaction = getTransactionEntityAndCheckOwnership(transactionID, username);
         LocalDate originDate = originTransaction.getDate() != null ? originTransaction.getDate() : LocalDate.now();
         LocalDate targetDate = originDate.withMonth(targetMonth).withYear(targetYear);
