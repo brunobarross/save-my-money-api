@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Repository
+
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
     @Query("SELECT t FROM Transaction t WHERE t.wallet.id = :walletId " +
             "AND t.wallet.user.userId = :userId " +
