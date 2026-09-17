@@ -12,22 +12,22 @@ services:
       POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-secretpassword}
     networks:
       - app-network
-  spring-app:
-    image: docker.io/altamirobruno/save-my-money:latest
-    container_name: spring_boot_app
-    restart: always
-    ports:
-      - "8080:8080"
-    environment:
-      # Injecting environment variables into Spring Boot
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/${SPING_DATASOURCE_URL:-savemymoney}
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-secretpassword}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-    depends_on:
-      - postgres-db
-    networks:
-      - app-network
+  # spring-app:
+  #   image: docker.io/altamirobruno/save-my-money:latest
+  #   container_name: spring_boot_app
+  #   restart: always
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     # Injecting environment variables into Spring Boot
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/${SPING_DATASOURCE_URL:-savemymoney}
+  #     SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-postgres}
+  #     SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-secretpassword}
+  #     SPRING_JPA_HIBERNATE_DDL_AUTO: update
+  #   depends_on:
+  #     - postgres-db
+  #   networks:
+  #     - app-network
 
   pgadmin:
     image: dpage/pgadmin4

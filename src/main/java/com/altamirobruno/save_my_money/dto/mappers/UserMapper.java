@@ -1,14 +1,10 @@
 package com.altamirobruno.save_my_money.dto.mappers;
 
 import com.altamirobruno.save_my_money.dto.UserDTO;
-import com.altamirobruno.save_my_money.enums.RoleName;
-import com.altamirobruno.save_my_money.model.Role;
 import com.altamirobruno.save_my_money.model.User;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Component

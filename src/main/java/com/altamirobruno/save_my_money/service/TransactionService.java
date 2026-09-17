@@ -16,10 +16,12 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -138,7 +140,8 @@ public class TransactionService {
 
 
     private List<Transaction> createInstallments(TransactionDTO transactionDTO, User user, int totalInstallments) {
-        LocalDate baseDate = transactionDTO.date() == null ? LocalDate.now() : transactionDTO.date();
+        ZoneId utcZoneId = ZoneId.of("UTC");
+        LocalDate baseDate = transactionDTO.date() == null ? LocalDate.now(utcZoneId) : transactionDTO.date();
         UUID groupId = UUID.randomUUID();
 
         List<Transaction> transactionsList = new ArrayList<>();
@@ -162,8 +165,9 @@ public class TransactionService {
 
     @Transactional
     public TransactionDTO copyTransaction(UUID transactionID, int targetMonth, int targetYear, String username) {
+        ZoneId utcZoneId = ZoneId.of("UTC");
         Transaction originTransaction = getTransactionEntityAndCheckOwnership(transactionID, username);
-        LocalDate originDate = originTransaction.getDate() != null ? originTransaction.getDate() : LocalDate.now();
+        LocalDate originDate = originTransaction.getDate() != null ? originTransaction.getDate() : LocalDate.now(utcZoneId);
         LocalDate targetDate = originDate.withMonth(targetMonth).withYear(targetYear);
 
         Transaction targetTransaction = new Transaction();
@@ -189,7 +193,7 @@ public class TransactionService {
         User user = this.userService.findUserByName(username);
 
         if (!transaction.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Access denied: You do not own this transaction");
+            throw new AccessDeniedException("Access denied: You do not own this transaction");
         }
 
         return transaction;

@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.UUID;
 
 @Getter
@@ -53,7 +53,8 @@ public class Transaction {
 
     @PrePersist
     public void prePersist() {
+        ZoneId utcZone = ZoneId.of("UTC");
         if (this.date == null)
-            this.date = LocalDate.now();
+            this.date = LocalDate.now(utcZone);
     }
 }

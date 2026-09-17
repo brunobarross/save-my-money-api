@@ -10,16 +10,19 @@ import com.altamirobruno.save_my_money.repository.WalletRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
+@Validated
 public class WalletService {
     private final WalletRepository walletRepository;
     private final WalletMapper walletMapper;
@@ -35,7 +38,8 @@ public class WalletService {
 
     public BigDecimal calculateBalance(UUID walletId, Integer month, Integer year) {
         if (month == null || year == null) {
-            LocalDate now = LocalDate.now();
+            ZoneId utcZoneId = ZoneId.of("UTC");
+            LocalDate now = LocalDate.now(utcZoneId);
             month = (month == null) ? now.getMonthValue() : month;
             year = (year == null) ? now.getYear() : year;
         }
@@ -48,17 +52,17 @@ public class WalletService {
         User user = this.userService.findUserByName(username);
         return walletRepository.findByUser(user)
                 .stream()
-                .map((wallet) -> {
+                .map(wallet -> {
                     BigDecimal amount = this.calculateBalance(wallet.getId(), month, year);
                     return walletMapper.toDTO(wallet, amount);
-                }).collect(Collectors.toList());
+                }).toList();
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     public WalletDTO getById(@NotNull UUID id, String username) {
         Wallet walletEntity = getWalletEntityAndCheckOwnership(id, username);
-
-        LocalDate now = LocalDate.now();
+        ZoneId utcZoneId = ZoneId.of("UTC");
+        LocalDate now = LocalDate.now(utcZoneId);
         BigDecimal amount = this.calculateBalance(walletEntity.getId(), now.getMonthValue(), now.getYear());
 
         return walletMapper.toDTO(walletEntity, amount);
@@ -84,8 +88,8 @@ public class WalletService {
 
         walletEntity.setName(walletDTO.name());
         walletEntity.setColor(walletDTO.color());
-
-        LocalDate now = LocalDate.now();
+        ZoneId utZoneId = ZoneId.of("UTC");
+        LocalDate now = LocalDate.now(utZoneId);
         BigDecimal amount = this.calculateBalance(walletEntity.getId(), now.getMonthValue(), now.getYear());
         walletEntity.setAmount(amount);
 
@@ -106,7 +110,7 @@ public class WalletService {
         User user = this.userService.findUserByName(username);
 
         if (!wallet.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Access denied: You do not own this wallet");
+            throw new AccessDeniedException("Access denied: You do not own this wallet");
         }
 
         return wallet;
